@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Zap, Droplet, BookOpen, Settings } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const [query, setQuery] = useState('');
+  const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    if (e.key === 'Enter' || e.type === 'click') {
+      if (query.trim()) {
+        navigate(`/services?search=${encodeURIComponent(query.trim())}`);
+      }
+    }
+  };
+
   const categories = [
     { name: 'Electrician', icon: <Zap size={40} color="#6366f1" />, color: 'rgba(99, 102, 241, 0.1)' },
     { name: 'Plumber', icon: <Droplet size={40} color="#06b6d4" />, color: 'rgba(6, 182, 212, 0.1)' },
@@ -28,8 +39,22 @@ const Home = () => {
             placeholder="What service do you need today?" 
             className="glass-input"
             style={{ paddingLeft: '3.5rem', fontSize: '1.2rem', height: '64px', borderRadius: '32px' }}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleSearch}
           />
-          <Search style={{ position: 'absolute', left: '1.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)' }} size={28} />
+          <Search 
+            style={{ 
+              position: 'absolute', 
+              left: '1.5rem', 
+              top: '50%', 
+              transform: 'translateY(-50%)', 
+              color: 'var(--primary)',
+              cursor: 'pointer' 
+            }} 
+            size={28}
+            onClick={handleSearch}
+          />
         </div>
       </header>
 

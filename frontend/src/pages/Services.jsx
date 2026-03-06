@@ -9,16 +9,27 @@ const Services = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const categoryParam = searchParams.get('category');
+  const searchQuery = searchParams.get('search')?.toLowerCase();
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const { data } = await axios.get('/api/services');
+        let filtered = data;
+
         if (categoryParam) {
-          setServices(data.filter(s => s.category === categoryParam));
-        } else {
-          setServices(data);
+          filtered = filtered.filter(s => s.category === categoryParam);
         }
+
+        if (searchQuery) {
+          filtered = filtered.filter(s => 
+            s.serviceName.toLowerCase().includes(searchQuery) ||
+            s.description.toLowerCase().includes(searchQuery) ||
+            s.category.toLowerCase().includes(searchQuery)
+          );
+        }
+
+        setServices(filtered);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching services', error);
@@ -26,7 +37,7 @@ const Services = () => {
       }
     };
     fetchServices();
-  }, [categoryParam]);
+  }, [categoryParam, searchQuery]);
 
   if (loading) return <div className="container" style={{ textAlign: 'center', padding: '4rem' }}>Loading services...</div>;
 
